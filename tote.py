@@ -380,13 +380,19 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
 
 def main():
     st.set_page_config(
-        page_title="Sticker Label Generator",
+        page_title="Tote Label Generator",
         page_icon="🏷️",
         layout="wide"
     )
     
-    st.title("🏷️ Sticker Label Generator")
-    st.markdown("Generate professional sticker labels with QR codes from Excel/CSV files")
+    st.title("🏷️Tote Label Generator")
+    st.markdown(
+        "<p style='font-size:18px; font-style:italic; margin-top:-10px; text-align:left;'>"
+        "Designed and Developed by Agilomatrix</p>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown("---")
     
     # Sidebar for file upload
     with st.sidebar:
@@ -420,7 +426,7 @@ def main():
                 st.dataframe(df.head(10), use_container_width=True)
                 
                 # Generate button
-                if st.button("🚀 Generate Sticker Labels", type="primary", use_container_width=True):
+                if st.button("🚀 Generate Tote Labels", type="primary", use_container_width=True):
                     with st.spinner("Generating sticker labels..."):
                         # Create containers for progress and status
                         progress_bar = st.progress(0)
@@ -446,9 +452,9 @@ def main():
                                 use_container_width=True
                             )
                             
-                            st.success("✅ Sticker labels generated successfully!")
+                            st.success("✅ Tote labels generated successfully!")
                         else:
-                            st.error("❌ Failed to generate sticker labels")
+                            st.error("❌ Failed to generate tote labels")
                             
             except Exception as e:
                 st.error(f"Error reading file: {str(e)}")
