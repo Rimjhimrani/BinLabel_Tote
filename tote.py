@@ -85,26 +85,72 @@ def generate_qr_code(data_string):
         st.error(f"Error generating QR code: {e}")
         return None
 
-def parse_location_string(location_str):
-    """Parse a location string into components for table display"""
-    # Initialize with empty values - 7 components to match table structure
-    location_parts = [''] * 7
+def find_column(df, keywords):
+    """Find a column in the DataFrame that matches any of the keywords (case-insensitive)"""
+    cols = df.columns.tolist()
+    for keyword in keywords:
+        for col in cols:
+            if isinstance(col, str) and keyword.upper() in col.upper():
+                return col
+    return None
 
-    if not location_str or not isinstance(location_str, str):
-        return location_parts
+def extract_line_location_components(row, columns):
+    """Extract components for Line Location (L.LOC) from specific columns"""
+    components = [''] * 7
+    
+    # Extract values from respective columns
+    if columns['model'] and columns['model'] in row:
+        components[0] = str(row[columns['model']]) if pd.notna(row[columns['model']]) else ""
+    
+    if columns['station_no'] and columns['station_no'] in row:
+        components[1] = str(row[columns['station_no']]) if pd.notna(row[columns['station_no']]) else ""
+    
+    if columns['rack'] and columns['rack'] in row:
+        components[2] = str(row[columns['rack']]) if pd.notna(row[columns['rack']]) else ""
+    
+    # Extract first digit from separate column
+    if columns['rack_no_1st'] and columns['rack_no_1st'] in row:
+        components[3] = str(row[columns['rack_no_1st']]) if pd.notna(row[columns['rack_no_1st']]) else ""
+    
+    # Extract second digit from separate column
+    if columns['rack_no_2nd'] and columns['rack_no_2nd'] in row:
+        components[4] = str(row[columns['rack_no_2nd']]) if pd.notna(row[columns['rack_no_2nd']]) else ""
+    
+    if columns['level'] and columns['level'] in row:
+        components[5] = str(row[columns['level']]) if pd.notna(row[columns['level']]) else ""
+    
+    if columns['cell'] and columns['cell'] in row:
+        components[6] = str(row[columns['cell']]) if pd.notna(row[columns['cell']]) else ""
+    
+    return components
 
-    # Remove any extra spaces
-    location_str = location_str.strip()
-
-    # Try to parse location components
-    pattern = r'([^_\s]+)'
-    matches = re.findall(pattern, location_str)
-
-    # Fill the available parts - up to 7 parts
-    for i, match in enumerate(matches[:7]):
-        location_parts[i] = match
-
-    return location_parts
+def extract_store_location_components(row, columns):
+    """Extract components for Store Location (S.LOC) from ABB columns"""
+    components = [''] * 7
+    
+    # Extract values from ABB columns
+    if columns['abb_zone'] and columns['abb_zone'] in row:
+        components[0] = str(row[columns['abb_zone']]) if pd.notna(row[columns['abb_zone']]) else ""
+    
+    if columns['abb_location'] and columns['abb_location'] in row:
+        components[1] = str(row[columns['abb_location']]) if pd.notna(row[columns['abb_location']]) else ""
+    
+    if columns['abb_floor'] and columns['abb_floor'] in row:
+        components[2] = str(row[columns['abb_floor']]) if pd.notna(row[columns['abb_floor']]) else ""
+    
+    if columns['abb_rack_no'] and columns['abb_rack_no'] in row:
+        components[3] = str(row[columns['abb_rack_no']]) if pd.notna(row[columns['abb_rack_no']]) else ""
+    
+    if columns['abb_level_in_rack'] and columns['abb_level_in_rack'] in row:
+        components[4] = str(row[columns['abb_level_in_rack']]) if pd.notna(row[columns['abb_level_in_rack']]) else ""
+    
+    if columns['abb_cell'] and columns['abb_cell'] in row:
+        components[5] = str(row[columns['abb_cell']]) if pd.notna(row[columns['abb_cell']]) else ""
+    
+    if columns['abb_no'] and columns['abb_no'] in row:
+        components[6] = str(row[columns['abb_no']]) if pd.notna(row[columns['abb_no']]) else ""
+    
+    return components
 
 def generate_sticker_labels(df, progress_bar=None, status_container=None):
     """Generate sticker labels with QR code from DataFrame"""
@@ -124,42 +170,47 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
         )
         canvas.restoreState()
 
-    # Identify columns (case-insensitive)
+    # Identify columns (case-insensitive) - Updated for your exact column names
     original_columns = df.columns.tolist()
-    df.columns = [col.upper() if isinstance(col, str) else col for col in df.columns]
-    cols = df.columns.tolist()
-
-    # Find relevant columns
-    part_no_col = next((col for col in cols if 'PART' in col and ('NO' in col or 'NUM' in col or '#' in col)),
-                   next((col for col in cols if col in ['PARTNO', 'PART']), cols[0]))
-
-    desc_col = next((col for col in cols if 'DESC' in col),
-                   next((col for col in cols if 'NAME' in col), cols[1] if len(cols) > 1 else part_no_col))
-
-    # Look specifically for "QTY/BIN" column first
-    qty_bin_col = next((col for col in cols if 'QTY/BIN' in col or 'QTY_BIN' in col or 'QTYBIN' in col), 
-                  next((col for col in cols if 'QTY' in col and 'BIN' in col), None))
     
-    # If no specific QTY/BIN column is found, fall back to general QTY column
-    if not qty_bin_col:
-        qty_bin_col = next((col for col in cols if 'QTY' in col),
-                      next((col for col in cols if 'QUANTITY' in col), None))
-  
-    loc_col = next((col for col in cols if 'LOC' in col or 'POS' in col or 'LOCATION' in col),
-                   cols[2] if len(cols) > 2 else desc_col)
-
-    # Look for store location column
-    store_loc_col = next((col for col in cols if 'STORE' in col and 'LOC' in col),
-                      next((col for col in cols if 'STORELOCATION' in col), None))
+    # Find basic columns
+    part_no_col = find_column(df, ['PART NO', 'PARTNO', 'PART', 'PART_NO', 'PART#'])
+    desc_col = find_column(df, ['PART DESC', 'DESC', 'DESCRIPTION', 'NAME', 'PRODUCT_NAME'])
+    qty_bin_col = find_column(df, ['QTY/BIN', 'QTY_BIN', 'QTYBIN', 'QTY', 'QUANTITY'])
+    
+    # Find Line Location columns - Updated for your exact column names
+    line_location_columns = {
+        'model': find_column(df, ['MODEL', 'BUS MODEL', 'BUS_MODEL', 'BUSMODEL', 'BUS']),
+        'station_no': find_column(df, ['STATION NO', 'STATION_NO', 'STATIONNO', 'STATION']),
+        'rack': find_column(df, ['RACK']),
+        'rack_no_1st': find_column(df, ['RACK NO. (1ST DIGIT)', 'RACK NO (1ST DIGIT)', 'RACK_NO_1ST', 'RACK NO 1ST']),
+        'rack_no_2nd': find_column(df, ['RACK NO. (2ND DIGIT)', 'RACK NO (2ND DIGIT)', 'RACK_NO_2ND', 'RACK NO 2ND']),
+        'level': find_column(df, ['LEVEL']),
+        'cell': find_column(df, ['CELL'])
+    }
+    
+    # Find Store Location (ABB) columns - Updated for your exact column names
+    store_location_columns = {
+        'abb_zone': find_column(df, ['ABB FOR ZONE', 'ABB_FOR_ZONE', 'ABB ZONE', 'ABB_ZONE', 'ABBZONE', 'ZONE']),
+        'abb_location': find_column(df, ['ABB FOR LOCATION', 'ABB_FOR_LOCATION', 'ABB LOCATION', 'ABB_LOCATION', 'ABBLOCATION']),
+        'abb_floor': find_column(df, ['ABB FOR FLOOR', 'ABB_FOR_FLOOR', 'ABB FLOOR', 'ABB_FLOOR', 'ABBFLOOR', 'FLOOR']),
+        'abb_rack_no': find_column(df, ['ABB FOR RACK NO', 'ABB_FOR_RACK_NO', 'ABB RACK NO', 'ABB_RACK_NO', 'ABBRACKNO', 'ABB RACK']),
+        'abb_level_in_rack': find_column(df, ['ABB FOR LEVEL IN RACK', 'ABB_FOR_LEVEL_IN_RACK', 'ABB LEVEL IN RACK', 'ABB_LEVEL_IN_RACK', 'ABBLEVELINRACK', 'ABB LEVEL']),
+        'abb_cell': find_column(df, ['ABB FOR CELL', 'ABB_FOR_CELL', 'ABB CELL', 'ABB_CELL', 'ABBCELL']),
+        'abb_no': find_column(df, ['ABB FOR NO', 'ABB_FOR_NO', 'ABB NO', 'ABB_NO', 'ABBNO', 'ABB NUMBER'])
+    }
 
     if status_container:
-        status_container.write(f"**Using columns:**")
+        status_container.write("**Using columns:**")
         status_container.write(f"- Part No: {part_no_col}")
         status_container.write(f"- Description: {desc_col}")
-        status_container.write(f"- Location: {loc_col}")
         status_container.write(f"- Qty/Bin: {qty_bin_col}")
-        if store_loc_col:
-            status_container.write(f"- Store Location: {store_loc_col}")
+        status_container.write("**Line Location columns:**")
+        for key, col in line_location_columns.items():
+            status_container.write(f"- {key}: {col}")
+        status_container.write("**Store Location (ABB) columns:**")
+        for key, col in store_location_columns.items():
+            status_container.write(f"- {key}: {col}")
 
     # Create temporary file for PDF output
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
@@ -185,22 +236,21 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
         
         elements = []
 
-        # Extract data
-        part_no = str(row[part_no_col])
-        desc = str(row[desc_col])
+        # Extract basic data
+        part_no = str(row[part_no_col]) if part_no_col and part_no_col in row else ""
+        desc = str(row[desc_col]) if desc_col and desc_col in row else ""
+        qty_bin = str(row[qty_bin_col]) if qty_bin_col and qty_bin_col in row and pd.notna(row[qty_bin_col]) else ""
         
-        # Extract QTY/BIN properly
-        qty_bin = ""
-        if qty_bin_col and qty_bin_col in row and pd.notna(row[qty_bin_col]):
-            qty_bin = str(row[qty_bin_col])
-            
-        location_str = str(row[loc_col]) if loc_col and loc_col in row else ""
-        store_location = str(row[store_loc_col]) if store_loc_col and store_loc_col in row else ""
-        location_parts = parse_location_string(location_str)
+        # Extract Line Location components
+        line_location_parts = extract_line_location_components(row, line_location_columns)
+        
+        # Extract Store Location components
+        store_location_parts = extract_store_location_components(row, store_location_columns)
 
         # Generate QR code with part information
-        qr_data = f"Part No: {part_no}\nDescription: {desc}\nLocation: {location_str}\n"
-        qr_data += f"Store Location: {store_location}\nQTY/BIN: {qty_bin}"
+        qr_data = f"Part No: {part_no}\nDescription: {desc}\nQTY/BIN: {qty_bin}\n"
+        qr_data += f"Line Location: {' | '.join(line_location_parts)}\n"
+        qr_data += f"Store Location: {' | '.join(store_location_parts)}"
         
         qr_image = generate_qr_code(qr_data)
         
@@ -249,11 +299,8 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
         total_proportion = sum(COLUMN_WIDTH_PROPORTIONS)
         inner_col_widths = [w * inner_table_width / total_proportion for w in COLUMN_WIDTH_PROPORTIONS]
 
-        # Use store_location if available, otherwise use empty values
-        store_loc_values = parse_location_string(store_location) if store_location else ["", "", "", "", "", "", ""]
-
         store_loc_inner_table = Table(
-            [store_loc_values],
+            [store_location_parts],
             colWidths=inner_col_widths,
             rowHeights=[location_row_height]
         )
@@ -283,9 +330,9 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
             name='LineLoc', fontName='Helvetica-Bold', fontSize=7, alignment=TA_CENTER
         ))
         
-        # Create the inner table for location_parts using the same fixed widths
+        # Create the inner table for line location parts using the same fixed widths
         line_loc_inner_table = Table(
-            [location_parts],
+            [line_location_parts],
             colWidths=inner_col_widths,
             rowHeights=[location_row_height]
         )
@@ -447,7 +494,7 @@ def main():
                             st.download_button(
                                 label="📥 Download PDF",
                                 data=pdf_data,
-                                file_name=f"{uploaded_file.name.split('.')[0]}_sticker_labels.pdf",
+                                file_name=f"{uploaded_file.name.split('.')[0]}_tote_labels.pdf",
                                 mime="application/pdf",
                                 use_container_width=True
                             )
@@ -462,33 +509,45 @@ def main():
             st.info("👈 Please upload an Excel or CSV file to get started")
     
     with col2:
-        st.subheader("ℹ️ Information")
+        st.subheader("ℹ️ Column Mapping")
         
         st.markdown("""
-        **Fixed Layout Specifications:**
-        - **Sticker Size:** 10cm × 15cm
-        - **Content Box:** 8cm × 3cm
-        - **QR Code:** 1.5cm × 1.5cm
-        - **7-Box Layout:** Fixed proportions
-        - **L.LOC & S.LOC:** Fixed sizes (no sliders)
+        **Line Location (L.LOC) - 7 boxes:**
+        1. **Model** (MODEL, BUS MODEL, etc.)
+        2. **Station No** (STATION NO, STATION_NO, etc.)
+        3. **Rack** (RACK)
+        4. **Rack No. (1st digit)** (RACK NO. (1ST DIGIT))
+        5. **Rack No. (2nd digit)** (RACK NO. (2ND DIGIT))
+        6. **Level** (LEVEL)
+        7. **Cell** (CELL)
         """)
         
         st.markdown("""
-        **Expected Columns:**
-        - Part Number (PART, PARTNO, etc.)
-        - Description (DESC, NAME, etc.)
-        - Quantity/Bin (QTY/BIN, QTY, etc.)
-        - Location (LOC, LOCATION, POS, etc.)
-        - Store Location (STORE LOC, etc.)
+        **Store Location (S.LOC) - 7 boxes:**
+        1. **ABB for zone** (ABB FOR ZONE, ABB_FOR_ZONE, etc.)
+        2. **ABB for location** (ABB FOR LOCATION, ABB_FOR_LOCATION, etc.)
+        3. **ABB for floor** (ABB FOR FLOOR, ABB_FOR_FLOOR, etc.)
+        4. **ABB for Rack No** (ABB FOR RACK NO, ABB_FOR_RACK_NO, etc.)
+        5. **ABB for level in rack** (ABB FOR LEVEL IN RACK, etc.)
+        6. **ABB for cell** (ABB FOR CELL, ABB_FOR_CELL, etc.)
+        7. **ABB for No** (ABB FOR NO, ABB_FOR_NO, etc.)
+        """)
+        
+        st.markdown("""
+        **Basic Columns:**
+        - Part No (PART NO, PARTNO, etc.)
+        - Part Desc (PART DESC, DESC, etc.)
+        - Qty/Bin (QTY/BIN, QTY, etc.)
         """)
         
         st.markdown("""
         **Features:**
-        ✅ QR code with all part information  
+        ✅ Automatic column detection  
+        ✅ QR code with all information  
         ✅ Professional layout with borders  
-        ✅ Optimized space utilization  
+        ✅ 7-box layout for locations  
+        ✅ Separate rack digit columns  
         ✅ One sticker per page  
-        ✅ Ready for printing  
         """)
 
 if __name__ == "__main__":
