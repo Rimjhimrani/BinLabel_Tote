@@ -342,7 +342,7 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8)
+            ('FONTSIZE', (0, 0), (-1, -1), 7)
         ]))
         
         # Wrap the label and the inner table in a containing table
