@@ -438,6 +438,30 @@ def main():
         "Designed and Developed by Agilomatrix</p>",
         unsafe_allow_html=True
     )
+    
+    # Show expected data format
+    st.subheader("📋 Expected Data Format")
+    sample_data = {
+        'Part No': ['08-DRA-14-02', 'P0012124-07', 'P0012126-07'],
+        'Part Desc': ['BELLOW ASSY. WITH RETAINING CLIP', 'GUARD RING (hirkesh)', 'GUARD RING SEAL (hirkesh)'],
+        'Bus model': ['3WC', '3WM', '3WS'],
+        'Station No': ['CW40RH', 'CW40RH', 'CW40RH'],
+        'Rack': ['R', 'R', 'R'],
+        'Rack No (1st digit)': [0, 0, 0],
+        'Rack No (2nd digit)': [2, 2, 2],
+        'Level': ['A', 'A', 'A'],
+        'Cell': [1, 2, 3],
+        'ABB ZONE': ['HRD', 'HRD', 'HRD'],
+        'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
+        'ABB FLOOR': [1, 1, 1],
+        'ABB RACK NO': [2, 2, 2],
+        'ABB LEVEL IN RACK': ['A', 'A', 'A'],
+        'ABB CELL': [1, 2, 3],
+        'ABB NO': [1001, 1002, 1003]
+    }
+    
+    sample_df = pd.DataFrame(sample_data)
+    st.dataframe(sample_df, use_container_width=True)
 
     st.markdown("---")
     
@@ -533,30 +557,6 @@ def main():
             st.error(f"Error reading file: {str(e)}")
     else:
         st.info("👈 Please upload an Excel or CSV file to get started")
-        
-        # Show sample data format when no file is uploaded
-        st.subheader("📋 Expected Data Format")
-        sample_data = {
-            'Part No': ['08-DRA-14-02', 'P0012124-07', 'P0012126-07'],
-            'Part Desc': ['BELLOW ASSY. WITH RETAINING CLIP', 'GUARD RING (hirkesh)', 'GUARD RING SEAL (hirkesh)'],
-            'Bus model': ['3WC', '3WM', '3WS'],
-            'Station No': ['CW40RH', 'CW40RH', 'CW40RH'],
-            'Rack': ['R', 'R', 'R'],
-            'Rack No (1st digit)': [0, 0, 0],
-            'Rack No (2nd digit)': [2, 2, 2],
-            'Level': ['A', 'A', 'A'],
-            'Cell': [1, 2, 3],
-            'ABB ZONE': ['HRD', 'HRD', 'HRD'],
-            'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
-            'ABB FLOOR': [1, 1, 1],
-            'ABB RACK NO': [2, 2, 2],
-            'ABB LEVEL IN RACK': ['A', 'A', 'A'],
-            'ABB CELL': [1, 2, 3],
-            'ABB NO': [1001, 1002, 1003]
-        }
-        
-        sample_df = pd.DataFrame(sample_data)
-        st.dataframe(sample_df, use_container_width=True)
 
 if __name__ == "__main__":
     main()
