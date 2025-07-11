@@ -444,7 +444,7 @@ def main():
     st.info("👈 Please upload an Excel or CSV file to get started")
     
     # Show expected data format
-    st.subheader("📋 Expected Data Format")
+    st.subheader("📋 Reference For Data Format")
     sample_data = {
         'Part No': ['08-DRA-14-02', 'P0012124-07', 'P0012126-07'],
         'Part Desc': ['BELLOW ASSY. WITH RETAINING CLIP', 'GUARD RING (hirkesh)', 'GUARD RING SEAL (hirkesh)'],
