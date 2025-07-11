@@ -438,6 +438,10 @@ def main():
         "Designed and Developed by Agilomatrix</p>",
         unsafe_allow_html=True
     )
+
+    st.markdown("---")
+
+    st.info("👈 Please upload an Excel or CSV file to get started")
     
     # Show expected data format
     st.subheader("📋 Expected Data Format")
@@ -556,7 +560,7 @@ def main():
         except Exception as e:
             st.error(f"Error reading file: {str(e)}")
     else:
-        st.info("👈 Please upload an Excel or CSV file to get started")
+        pass # Info message is already shown at the top
 
 if __name__ == "__main__":
     main()
