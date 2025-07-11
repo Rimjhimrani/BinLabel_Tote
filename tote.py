@@ -573,40 +573,36 @@ def main():
             'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
             'ABB FLOOR': [1, 1, 1],
             'ABB RACK NO': [2, 2, 2],
-        'ABB LEVEL IN RACK': ['C', 'D', 'B'],
-        'ABB CELL': [0, 0, 0],
-        'ABB NO': [1, 4, 5],
-    }
-    
-    sample_df = pd.DataFrame(sample_data)
-    st.dataframe(sample_df)
-    
-    st.markdown("""
-    **Column Requirements:**
-    - **Part No**: Part number or identifier
-    - **Part Desc**: Part description
-    - **Bin Type**: Type of bin (TOTE, BIN A, BIN B, BIN C, etc.)
-    - **Qty/bin**: Quantity per bin
-    - **Qty/veh**: Quantity per vehicle
-    - **Bus model**: Bus model type (3WC, 3WM, 3WS, 4W, etc.)
-    - **Station No**: Station identifier
-    - **Rack**: Rack identifier
-    - **Rack No (1st digit)**: First digit of rack number
-    - **Rack No (2nd digit)**: Second digit of rack number
-    - **Level**: Storage level (A, B, C, etc.)
-    - **Cell**: Cell number
-    - **ABB ZONE**: ABB zone identifier
-    - **ABB LOCATION**: ABB location code
-    - **ABB FLOOR**: ABB floor number
-    - **ABB RACK NO**: ABB rack number
-    - **ABB LEVEL IN RACK**: ABB level in rack
-    - **ABB CELL**: ABB cell number
-    - **ABB NO**: ABB number
-    
-    ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
-    
-    📍 **Location Information**: The system will automatically combine location fields to create a comprehensive storage location identifier.
-    """)
-
+            'ABB LEVEL IN RACK': ['C', 'D', 'B'],
+            'ABB CELL': [0, 0, 0],
+            'ABB NO': [1, 4, 5],
+        }
+        sample_df = pd.DataFrame(sample_data)
+        st.dataframe(sample_df)
+        st.markdown("""
+        **Column Requirements:**
+        - **Part No**: Part number or identifier
+        - **Part Desc**: Part description
+        - **Bin Type**: Type of bin (TOTE, BIN A, BIN B, BIN C, etc.)
+        - **Qty/bin**: Quantity per bin
+        - **Qty/veh**: Quantity per vehicle
+        - **Bus model**: Bus model type (3WC, 3WM, 3WS, 4W, etc.)
+        - **Station No**: Station identifier
+        - **Rack**: Rack identifier
+        - **Rack No (1st digit)**: First digit of rack number
+        - **Rack No (2nd digit)**: Second digit of rack number
+        - **Level**: Storage level (A, B, C, etc.)
+        - **Cell**: Cell number
+        - **ABB ZONE**: ABB zone identifier
+        - **ABB LOCATION**: ABB location code
+        - **ABB FLOOR**: ABB floor number
+        - **ABB RACK NO**: ABB rack number
+        - **ABB LEVEL IN RACK**: ABB level in rack
+        - **ABB CELL**: ABB cell number
+        - **ABB NO**: ABB number
+        ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
+        📍 **Location Information**: The system will automatically combine location fields to create a comprehensive storage location identifier.
+        """)
+        
 if __name__ == "__main__":
     main()
