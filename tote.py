@@ -441,128 +441,12 @@ def main():
 
     st.markdown("---")
     
-    # Sidebar for file upload
-    with st.sidebar:
-        st.header("📁 File Upload")
-        uploaded_file = st.file_uploader(
-            "Choose Excel or CSV file",
-            type=['xlsx', 'xls', 'csv'],
-            help="Upload your Excel or CSV file containing product data"
-        )
-        
-        if uploaded_file:
-            st.success(f"File uploaded: {uploaded_file.name}")
+    # Column mapping information
+    st.subheader("ℹ️ Column Mapping")
     
-    # Main content area
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns(2)
     
     with col1:
-        if uploaded_file is not None:
-            try:
-                # Read the file
-                if uploaded_file.name.lower().endswith('.csv'):
-                    df = pd.read_csv(uploaded_file)
-                else:
-                    df = pd.read_excel(uploaded_file)
-                
-                st.subheader("📊 Data Preview")
-                st.write(f"**Total rows:** {len(df)}")
-                st.write(f"**Columns:** {', '.join(df.columns.tolist())}")
-                
-                # Show preview of data
-                st.dataframe(df.head(10), use_container_width=True)
-                
-                # Generate button
-                if st.button("🚀 Generate Tote Labels", type="primary", use_container_width=True):
-                    with st.spinner("Generating sticker labels..."):
-                        # Create containers for progress and status
-                        progress_bar = st.progress(0)
-                        status_container = st.empty()
-                        
-                        # Generate the PDF
-                        pdf_path = generate_sticker_labels(df, progress_bar, status_container)
-                        
-                        if pdf_path:
-                            # Read the generated PDF
-                            with open(pdf_path, 'rb') as pdf_file:
-                                pdf_data = pdf_file.read()
-                            
-                            # Clean up temporary file
-                            os.unlink(pdf_path)
-                            
-                            # Download button
-                            st.download_button(
-                                label="📥 Download PDF",
-                                data=pdf_data,
-                                file_name=f"{uploaded_file.name.split('.')[0]}_tote_labels.pdf",
-                                mime="application/pdf",
-                                use_container_width=True
-                            )
-                            
-                            st.success("✅ Tote labels generated successfully!")
-                        else:
-                            st.error("❌ Failed to generate tote labels")
-                            
-            except Exception as e:
-                st.error(f"Error reading file: {str(e)}")
-        else:
-            st.info("👈 Please upload an Excel or CSV file to get started")
-            
-            # Show sample data format when no file is uploaded
-            st.subheader("📋 Expected Data Format")
-            sample_data = {
-                'Part No': ['08-DRA-14-02', 'P0012124-07', 'P0012126-07'],
-                'Part Desc': ['BELLOW ASSY. WITH RETAINING CLIP', 'GUARD RING (hirkesh)', 'GUARD RING SEAL (hirkesh)'],
-                'Bus model': ['3WC', '3WM', '3WS'],
-                'Station No': ['CW40RH', 'CW40RH', 'CW40RH'],
-                'Rack': ['R', 'R', 'R'],
-                'Rack No (1st digit)': [0, 0, 0],
-                'Rack No (2nd digit)': [2, 2, 2],
-                'Level': ['A', 'A', 'A'],
-                'Cell': [1, 2, 3],
-                'ABB ZONE': ['HRD', 'HRD', 'HRD'],
-                'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
-                'ABB FLOOR': [1, 1, 1],
-                'ABB RACK NO': [2, 2, 2],
-                'ABB LEVEL IN RACK': ['C', 'D', 'B'],
-                'ABB CELL': [0, 0, 0],
-                'ABB NO': [1, 4, 5],
-                'Qty/bin': [360, 20, 120],
-                'Bin Type': ['TOTE', 'BIN C', 'BIN A'],
-                'Qty/veh': [10, 5, 2]
-            }
-            
-            sample_df = pd.DataFrame(sample_data)
-            st.dataframe(sample_df, use_container_width=True)
-            
-            st.markdown("""
-            **Column Requirements:**
-            - **Part No**: Part number or identifier
-            - **Part Desc**: Part description
-            - **Bus model**: Bus model type (3WC, 3WM, 3WS, 4W, etc.)
-            - **Station No**: Station identifier
-            - **Rack**: Rack identifier
-            - **Rack No (1st digit)**: First digit of rack number
-            - **Rack No (2nd digit)**: Second digit of rack number
-            - **Level**: Storage level (A, B, C, etc.)
-            - **Cell**: Cell number
-            - **ABB ZONE**: ABB zone identifier
-            - **ABB LOCATION**: ABB location code
-            - **ABB FLOOR**: ABB floor number
-            - **ABB RACK NO**: ABB rack number
-            - **ABB LEVEL IN RACK**: ABB level in rack
-            - **ABB CELL**: ABB cell number
-            - **ABB NO**: ABB number
-            - **Qty/bin**: Quantity per bin
-            - **Bin Type**: Type of bin (TOTE, BIN A, BIN B, BIN C, etc.)
-            - **Qty/veh**: Quantity per vehicle
-            
-            ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
-            """)
-    
-    with col2:
-        st.subheader("ℹ️ Column Mapping")
-        
         st.markdown("""
         **Line Location (L.LOC) - 7 boxes:**
         1. **Bus Model** (BUS MODEL, MODEL, etc.)
@@ -575,6 +459,16 @@ def main():
         """)
         
         st.markdown("""
+        **Basic Columns:**
+        - **Part No** (PART NO, PARTNO, etc.)
+        - **Part Desc** (PART DESC, DESC, DESCRIPTION, etc.)
+        - **Qty/Bin** (QTY/BIN, QTY_BIN, QUANTITY, etc.)
+        - **Bin Type** (BIN TYPE, BIN_TYPE, etc.)
+        - **Qty/Veh** (QTY/VEH, QTY_VEH, etc.)
+        """)
+    
+    with col2:
+        st.markdown("""
         **Store Location (S.LOC) - 7 boxes:**
         1. **ABB Zone** (ABB ZONE, ABB_ZONE, etc.)
         2. **ABB Location** (ABB LOCATION, ABB_LOCATION, etc.)
@@ -583,15 +477,6 @@ def main():
         5. **ABB Level in Rack** (ABB LEVEL IN RACK, etc.)
         6. **ABB Cell** (ABB CELL, ABB_CELL, etc.)
         7. **ABB No** (ABB NO, ABB_NO, etc.)
-        """)
-        
-        st.markdown("""
-        **Basic Columns:**
-        - **Part No** (PART NO, PARTNO, etc.)
-        - **Part Desc** (PART DESC, DESC, DESCRIPTION, etc.)
-        - **Qty/Bin** (QTY/BIN, QTY_BIN, QUANTITY, etc.)
-        - **Bin Type** (BIN TYPE, BIN_TYPE, etc.)
-        - **Qty/Veh** (QTY/VEH, QTY_VEH, etc.)
         """)
         
         st.markdown("""
@@ -605,6 +490,123 @@ def main():
         ✅ Support for new Excel format  
         ✅ ABB location mapping  
         """)
+    
+    st.markdown("---")
+    
+    # Sidebar for file upload
+    with st.sidebar:
+        st.header("📁 File Upload")
+        uploaded_file = st.file_uploader(
+            "Choose Excel or CSV file",
+            type=['xlsx', 'xls', 'csv'],
+            help="Upload your Excel or CSV file containing product data"
+        )
+        
+        if uploaded_file:
+            st.success(f"File uploaded: {uploaded_file.name}")
+    
+    # Main content area - Single column layout
+    if uploaded_file is not None:
+        try:
+            # Read the file
+            if uploaded_file.name.lower().endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+            
+            st.subheader("📊 Data Preview")
+            st.write(f"**Total rows:** {len(df)}")
+            st.write(f"**Columns:** {', '.join(df.columns.tolist())}")
+            
+            # Show preview of data
+            st.dataframe(df.head(10), use_container_width=True)
+            
+            # Generate button
+            if st.button("🚀 Generate Tote Labels", type="primary", use_container_width=True):
+                with st.spinner("Generating sticker labels..."):
+                    # Create containers for progress and status
+                    progress_bar = st.progress(0)
+                    status_container = st.empty()
+                    
+                    # Generate the PDF
+                    pdf_path = generate_sticker_labels(df, progress_bar, status_container)
+                    
+                    if pdf_path:
+                        # Read the generated PDF
+                        with open(pdf_path, 'rb') as pdf_file:
+                            pdf_data = pdf_file.read()
+                        
+                        # Clean up temporary file
+                        os.unlink(pdf_path)
+                        
+                        # Download button
+                        st.download_button(
+                            label="📥 Download PDF",
+                            data=pdf_data,
+                            file_name=f"{uploaded_file.name.split('.')[0]}_tote_labels.pdf",
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                        
+                        st.success("✅ Tote labels generated successfully!")
+                    else:
+                        st.error("❌ Failed to generate tote labels")
+                        
+        except Exception as e:
+            st.error(f"Error reading file: {str(e)}")
+    else:
+        st.info("👈 Please upload an Excel or CSV file to get started")
+        
+        # Show sample data format when no file is uploaded
+        st.subheader("📋 Expected Data Format")
+        sample_data = {
+            'Part No': ['08-DRA-14-02', 'P0012124-07', 'P0012126-07'],
+            'Part Desc': ['BELLOW ASSY. WITH RETAINING CLIP', 'GUARD RING (hirkesh)', 'GUARD RING SEAL (hirkesh)'],
+            'Bus model': ['3WC', '3WM', '3WS'],
+            'Station No': ['CW40RH', 'CW40RH', 'CW40RH'],
+            'Rack': ['R', 'R', 'R'],
+            'Rack No (1st digit)': [0, 0, 0],
+            'Rack No (2nd digit)': [2, 2, 2],
+            'Level': ['A', 'A', 'A'],
+            'Cell': [1, 2, 3],
+            'ABB ZONE': ['HRD', 'HRD', 'HRD'],
+            'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
+            'ABB FLOOR': [1, 1, 1],
+            'ABB RACK NO': [2, 2, 2],
+        'ABB LEVEL IN RACK': ['C', 'D', 'B'],
+        'ABB CELL': [0, 0, 0],
+        'ABB NO': [1, 4, 5],
+    }
+    
+    sample_df = pd.DataFrame(sample_data)
+    st.dataframe(sample_df)
+    
+    st.markdown("""
+    **Column Requirements:**
+    - **Part No**: Part number or identifier
+    - **Part Desc**: Part description
+    - **Bin Type**: Type of bin (TOTE, BIN A, BIN B, BIN C, etc.)
+    - **Qty/bin**: Quantity per bin
+    - **Qty/veh**: Quantity per vehicle
+    - **Bus model**: Bus model type (3WC, 3WM, 3WS, 4W, etc.)
+    - **Station No**: Station identifier
+    - **Rack**: Rack identifier
+    - **Rack No (1st digit)**: First digit of rack number
+    - **Rack No (2nd digit)**: Second digit of rack number
+    - **Level**: Storage level (A, B, C, etc.)
+    - **Cell**: Cell number
+    - **ABB ZONE**: ABB zone identifier
+    - **ABB LOCATION**: ABB location code
+    - **ABB FLOOR**: ABB floor number
+    - **ABB RACK NO**: ABB rack number
+    - **ABB LEVEL IN RACK**: ABB level in rack
+    - **ABB CELL**: ABB cell number
+    - **ABB NO**: ABB number
+    
+    ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
+    
+    📍 **Location Information**: The system will automatically combine location fields to create a comprehensive storage location identifier.
+    """)
 
 if __name__ == "__main__":
     main()
