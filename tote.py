@@ -444,52 +444,29 @@ def main():
     # Column mapping information
     st.subheader("ℹ️ Column Mapping")
     
-    col1, col2 = st.columns(2)
+    # Single column layout - only keeping the previous col2 content
+    st.markdown("""
+    **Store Location (S.LOC) - 7 boxes:**
+    1. **ABB Zone** (ABB ZONE, ABB_ZONE, etc.)
+    2. **ABB Location** (ABB LOCATION, ABB_LOCATION, etc.)
+    3. **ABB Floor** (ABB FLOOR, ABB_FLOOR, etc.)
+    4. **ABB Rack No** (ABB RACK NO, ABB_RACK_NO, etc.)
+    5. **ABB Level in Rack** (ABB LEVEL IN RACK, etc.)
+    6. **ABB Cell** (ABB CELL, ABB_CELL, etc.)
+    7. **ABB No** (ABB NO, ABB_NO, etc.)
+    """)
     
-    with col1:
-        st.markdown("""
-        **Line Location (L.LOC) - 7 boxes:**
-        1. **Bus Model** (BUS MODEL, MODEL, etc.)
-        2. **Station No** (STATION NO, STATION_NO, etc.)
-        3. **Rack** (RACK)
-        4. **Rack No. (1st digit)** (RACK NO (1ST DIGIT))
-        5. **Rack No. (2nd digit)** (RACK NO (2ND DIGIT))
-        6. **Level** (LEVEL)
-        7. **Cell** (CELL)
-        """)
-        
-        st.markdown("""
-        **Basic Columns:**
-        - **Part No** (PART NO, PARTNO, etc.)
-        - **Part Desc** (PART DESC, DESC, DESCRIPTION, etc.)
-        - **Qty/Bin** (QTY/BIN, QTY_BIN, QUANTITY, etc.)
-        - **Bin Type** (BIN TYPE, BIN_TYPE, etc.)
-        - **Qty/Veh** (QTY/VEH, QTY_VEH, etc.)
-        """)
-    
-    with col2:
-        st.markdown("""
-        **Store Location (S.LOC) - 7 boxes:**
-        1. **ABB Zone** (ABB ZONE, ABB_ZONE, etc.)
-        2. **ABB Location** (ABB LOCATION, ABB_LOCATION, etc.)
-        3. **ABB Floor** (ABB FLOOR, ABB_FLOOR, etc.)
-        4. **ABB Rack No** (ABB RACK NO, ABB_RACK_NO, etc.)
-        5. **ABB Level in Rack** (ABB LEVEL IN RACK, etc.)
-        6. **ABB Cell** (ABB CELL, ABB_CELL, etc.)
-        7. **ABB No** (ABB NO, ABB_NO, etc.)
-        """)
-        
-        st.markdown("""
-        **Features:**
-        ✅ Automatic column detection  
-        ✅ QR code with all information  
-        ✅ Professional layout with borders  
-        ✅ 7-box layout for locations  
-        ✅ Separate rack digit columns  
-        ✅ One sticker per page  
-        ✅ Support for new Excel format  
-        ✅ ABB location mapping  
-        """)
+    st.markdown("""
+    **Features:**
+    ✅ Automatic column detection  
+    ✅ QR code with all information  
+    ✅ Professional layout with borders  
+    ✅ 7-box layout for locations  
+    ✅ Separate rack digit columns  
+    ✅ One sticker per page  
+    ✅ Support for new Excel format  
+    ✅ ABB location mapping  
+    """)
     
     st.markdown("---")
     
@@ -573,36 +550,13 @@ def main():
             'ABB LOCATION': ['ABF', 'ABF', 'ABF'],
             'ABB FLOOR': [1, 1, 1],
             'ABB RACK NO': [2, 2, 2],
-            'ABB LEVEL IN RACK': ['C', 'D', 'B'],
-            'ABB CELL': [0, 0, 0],
-            'ABB NO': [1, 4, 5],
+            'ABB LEVEL IN RACK': ['A', 'A', 'A'],
+            'ABB CELL': [1, 2, 3],
+            'ABB NO': [1001, 1002, 1003]
         }
-        sample_df = pd.DataFrame(sample_data)
-        st.dataframe(sample_df)
-        st.markdown("""
-        **Column Requirements:**
-        - **Part No**: Part number or identifier
-        - **Part Desc**: Part description
-        - **Bin Type**: Type of bin (TOTE, BIN A, BIN B, BIN C, etc.)
-        - **Qty/bin**: Quantity per bin
-        - **Qty/veh**: Quantity per vehicle
-        - **Bus model**: Bus model type (3WC, 3WM, 3WS, 4W, etc.)
-        - **Station No**: Station identifier
-        - **Rack**: Rack identifier
-        - **Rack No (1st digit)**: First digit of rack number
-        - **Rack No (2nd digit)**: Second digit of rack number
-        - **Level**: Storage level (A, B, C, etc.)
-        - **Cell**: Cell number
-        - **ABB ZONE**: ABB zone identifier
-        - **ABB LOCATION**: ABB location code
-        - **ABB FLOOR**: ABB floor number
-        - **ABB RACK NO**: ABB rack number
-        - **ABB LEVEL IN RACK**: ABB level in rack
-        - **ABB CELL**: ABB cell number
-        - **ABB NO**: ABB number
-        ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
-        📍 **Location Information**: The system will automatically combine location fields to create a comprehensive storage location identifier.
-        """)
         
+        sample_df = pd.DataFrame(sample_data)
+        st.dataframe(sample_df, use_container_width=True)
+
 if __name__ == "__main__":
     main()
