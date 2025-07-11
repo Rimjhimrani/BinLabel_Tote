@@ -454,6 +454,9 @@ def main():
             st.success(f"File uploaded: {uploaded_file.name}")
     
     # Main content area
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
         if uploaded_file is not None:
             try:
                 # Read the file
@@ -556,6 +559,52 @@ def main():
             
             ℹ️ Column names are case-insensitive and can contain variations (e.g., 'Part No', 'PART_NO', 'part_no', etc.)
             """)
+    
+    with col2:
+        st.subheader("ℹ️ Column Mapping")
+        
+        st.markdown("""
+        **Line Location (L.LOC) - 7 boxes:**
+        1. **Bus Model** (BUS MODEL, MODEL, etc.)
+        2. **Station No** (STATION NO, STATION_NO, etc.)
+        3. **Rack** (RACK)
+        4. **Rack No. (1st digit)** (RACK NO (1ST DIGIT))
+        5. **Rack No. (2nd digit)** (RACK NO (2ND DIGIT))
+        6. **Level** (LEVEL)
+        7. **Cell** (CELL)
+        """)
+        
+        st.markdown("""
+        **Store Location (S.LOC) - 7 boxes:**
+        1. **ABB Zone** (ABB ZONE, ABB_ZONE, etc.)
+        2. **ABB Location** (ABB LOCATION, ABB_LOCATION, etc.)
+        3. **ABB Floor** (ABB FLOOR, ABB_FLOOR, etc.)
+        4. **ABB Rack No** (ABB RACK NO, ABB_RACK_NO, etc.)
+        5. **ABB Level in Rack** (ABB LEVEL IN RACK, etc.)
+        6. **ABB Cell** (ABB CELL, ABB_CELL, etc.)
+        7. **ABB No** (ABB NO, ABB_NO, etc.)
+        """)
+        
+        st.markdown("""
+        **Basic Columns:**
+        - **Part No** (PART NO, PARTNO, etc.)
+        - **Part Desc** (PART DESC, DESC, DESCRIPTION, etc.)
+        - **Qty/Bin** (QTY/BIN, QTY_BIN, QUANTITY, etc.)
+        - **Bin Type** (BIN TYPE, BIN_TYPE, etc.)
+        - **Qty/Veh** (QTY/VEH, QTY_VEH, etc.)
+        """)
+        
+        st.markdown("""
+        **Features:**
+        ✅ Automatic column detection  
+        ✅ QR code with all information  
+        ✅ Professional layout with borders  
+        ✅ 7-box layout for locations  
+        ✅ Separate rack digit columns  
+        ✅ One sticker per page  
+        ✅ Support for new Excel format  
+        ✅ ABB location mapping  
+        """)
 
 if __name__ == "__main__":
     main()
