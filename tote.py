@@ -27,7 +27,7 @@ CONTENT_BOX_HEIGHT = 3 * cm
 COLUMN_WIDTH_PROPORTIONS = [1.0, 1.9, 0.8, 0.8, 0.7, 0.7, 0.8]
 
 # Fixed content positioning
-CONTENT_LEFT_OFFSET = 1.4 * cm
+CONTENT_LEFT_OFFSET = 0.3 * cm
 
 # Check for PIL and install if needed
 try:
