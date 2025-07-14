@@ -15,8 +15,8 @@ import re
 import tempfile
 
 # Define sticker dimensions - Fixed as per original code
-STICKER_WIDTH = 8.5 * cm
-STICKER_HEIGHT = 6 * cm
+STICKER_WIDTH = 10 * cm
+STICKER_HEIGHT = 15 * cm
 STICKER_PAGESIZE = (STICKER_WIDTH, STICKER_HEIGHT)
 
 # Define content box dimensions - Fixed as per original code
