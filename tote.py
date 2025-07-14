@@ -169,7 +169,12 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
             CONTENT_BOX_HEIGHT
         )
         canvas.restoreState()
-
+    # Updated spacer positioning to place content within the border box
+    def get_content_spacer_height():
+        """Calculate the spacer height to position content within the border box"""
+        border_top_margin = 0.2 * cm  # Same as y_offset margin in draw_border
+        return STICKER_HEIGHT - CONTENT_BOX_HEIGHT - border_top_margin
+        
     # Identify columns (case-insensitive) - Updated for your exact column names
     original_columns = df.columns.tolist()
     
