@@ -27,7 +27,7 @@ CONTENT_BOX_HEIGHT = 3 * cm
 COLUMN_WIDTH_PROPORTIONS = [1.0, 1.9, 0.8, 0.8, 0.7, 0.7, 0.8]
 
 # Fixed content positioning
-CONTENT_LEFT_OFFSET = 0.2 * cm
+CONTENT_LEFT_OFFSET = 1.4 * cm
 
 # Check for PIL and install if needed
 try:
@@ -159,7 +159,7 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
     def draw_border(canvas, doc):
         canvas.saveState()
         x_offset = CONTENT_LEFT_OFFSET
-        y_offset = STICKER_HEIGHT - CONTENT_BOX_HEIGHT - 0.2*cm
+        y_offset = STICKER_HEIGHT - CONTENT_BOX_HEIGHT - 0.8*cm
         canvas.setStrokeColor(colors.Color(0, 0, 0, alpha=0.95))
         canvas.setLineWidth(1.5)
         canvas.rect(
@@ -169,11 +169,6 @@ def generate_sticker_labels(df, progress_bar=None, status_container=None):
             CONTENT_BOX_HEIGHT
         )
         canvas.restoreState()
-    # Updated spacer positioning to place content within the border box
-    def get_content_spacer_height():
-        """Calculate the spacer height to position content within the border box"""
-        border_top_margin = 0.2 * cm  # Same as y_offset margin in draw_border
-        return STICKER_HEIGHT - CONTENT_BOX_HEIGHT - border_top_margin
         
     # Identify columns (case-insensitive) - Updated for your exact column names
     original_columns = df.columns.tolist()
